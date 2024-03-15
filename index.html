@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semáforo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav>
+        <h1>
+            <p>CONTROLE DE TRÂNSITO</p>
+        </h1>
+        <h3> Bem-vindo(a)!!!</h3>
+        <h3 id="dataAtual"></h3>
+        <button onclick="exibirExplicacao()">Menu</button> <!-- Botão de menu -->
+    </nav>
+
+    <div id="modal" class="modal"> <!-- Modal -->
+        <div class="modal-content">
+            <span class="close" onclick="fecharExplicacao()">&times;</span> <!-- Botão de fechar -->
+            <h2>Explicação:</h2>
+            <p><img src="images/estrela.png" id="aaaa">: Aguardando liberação e sem ninguém fora de sala</p>
+            <p><img src="images/coracao.png" id="aaaa">: Bloqueado, trânsito com alguém fora da sala ou liberado para sair</p>
+            <p><img src="images/trevo.png" id="aaaa">: Liberado, trânsito livre e sem ninguém fora de sala</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="imageContainer">
+        </div>
+    </div>
+
+    <script>
+        function carregarImagem() {
+            fetch('https://niloweb.com.br/transit-room/api/reg_endpoint.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0 && data[0].res && data[0].dia) {
+                        const imagem = document.createElement('img');
+                        const condition = data[0].res;
+                        switch (condition) {
+                            case 'A':
+                                imagem.src = "images/estrela.png";
+                                break;
+                            case 'B':
+                                imagem.src = "images/coracao.png";
+                                break;
+                            case 'L':
+                                imagem.src = "images/trevo.png";
+                                break;
+                            default:
+                                console.error('Condição desconhecida:', condition);
+                        }
+                        document.getElementById('imageContainer').appendChild(imagem);
+                    } else {
+                        console.error('Erro ao carregar imagem da API.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao conectar à API:', error);
+                });
+
+                
+            const dataAtual = new Date();
+            const dataFormatada = `${dataAtual.getDate()}/${dataAtual.getMonth() + 1}/${dataAtual.getFullYear()}`;
+            document.getElementById('dataAtual').textContent = `Data atual: ${dataFormatada}`;
+        }
+
+        window.onload = carregarImagem();
+
+        function exibirExplicacao() {
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function fecharExplicacao() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Fecha o modal quando clicado fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+
+</html>
